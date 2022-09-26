@@ -3,8 +3,9 @@ import random
 
 random.seed(10)
 
-path = "C:/Users/User/Documents/Python/Steganography-project/resources/kotiki.bmp"
-msg = "Hello world"
+path = "C:/Users/User/Documents/Python/Steganography-project/resources/apple.bmp"
+new_path = "C:/Users/User/Documents/Python/Steganography-project/resources/apple_new.bmp"
+msg = "Hello world\0"
 
 def load_image(path):
     image = cv2.imread(path)
@@ -22,15 +23,32 @@ def get_blue(image, x, y):
 
 def set_blue_last_0(image, x, y):
     current = get_blue(image, x, y)
-    current -= 0.1 * get_luminosity(image, x, y)
+    current -= 0.7 * get_luminosity_old(image, x, y)
     return image.itemset((x, y, 0), current)
+
+def set0(image,x,y):
+    return image.itemset((x,y,0), 0)
 
 def set_blue_last_1(image, x, y):
     current = get_blue(image, x, y)
-    current += 0.1 * get_luminosity(image, x, y)
+    current += 0.7 * get_luminosity_old(image, x, y)
     return image.itemset((x, y, 0), current)
+
+
+def set1(image,x,y):
+    return image.itemset((x,y,0), 255)
 
 def str2bin(text: str, encoding='utf-8') -> str:
     return ''.join(
         bin(c)[2:].rjust(8, '0') for c in text.encode(encoding)
     )
+
+def msgencoder(msg):
+    return format(int(bytes(msg, 'utf-8').hex(), base=16), 'b')
+
+def msgdecoder(msg):
+    return bytes.fromhex(format(int(msg, base=2), 'x')).decode('utf-8')
+
+def decode_binary_string(s, encoding='UTF-8'):
+    byte_string = ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))
+    return byte_string.decode(encoding)
