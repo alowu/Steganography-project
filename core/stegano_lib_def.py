@@ -1,12 +1,15 @@
 import cv2
 import random
+import os
 
 random.seed(10)
 
-path = "C:/Users/User/Documents/Python/Steganography-project/resources/apple.bmp"
-new_path = "C:/Users/User/Documents/Python/Steganography-project/resources/apple_new.bmp"
+# путь до пикчи абсолютный, относительный не работает
+path = "C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\apple.bmp"
+new_path = "C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\apple_new.bmp"
 msg = "Hello world\0"
 
+# load image for work
 def load_image(path):
     image = cv2.imread(path)
     return image
@@ -18,26 +21,35 @@ def get_luminosity(image, x, y):
 def get_luminosity_old(image, x, y):
     return image.item(x, y, 0) * 0.114 + image.item(x, y, 1) * 0.587 + image.item(x, y, 2) * 0.299 #BGR
 
+# get blue component luminosity value
 def get_blue(image, x, y):
     return image.item(x, y, 0)
 
+# decrease blue value
 def set_blue_last_0(image, x, y):
     current = get_blue(image, x, y)
-    current -= 0.7 * get_luminosity_old(image, x, y)
+    current -= 0.5 * get_luminosity_old(image, x, y)
+    if current < 0: current = 0
+    #current = 0
     return image.itemset((x, y, 0), current)
 
+# set blue to zero
 def set0(image,x,y):
     return image.itemset((x,y,0), 0)
 
+# encrease blue value
 def set_blue_last_1(image, x, y):
     current = get_blue(image, x, y)
-    current += 0.7 * get_luminosity_old(image, x, y)
+    current += 0.5 * get_luminosity_old(image, x, y)
+    if current > 255: current = 255
+    current = 255
     return image.itemset((x, y, 0), current)
 
-
+# set blue value to 255
 def set1(image,x,y):
     return image.itemset((x,y,0), 255)
 
+# some stolen functions for converting string into binary view
 def str2bin(text: str, encoding='utf-8') -> str:
     return ''.join(
         bin(c)[2:].rjust(8, '0') for c in text.encode(encoding)

@@ -18,6 +18,7 @@ ind_height = np.random.randint(my + 1, img_height - my, img_width * img_height)
 print(ind_height)
 print(ind_width)
 
+# calculate avg lumi value of near pixels
 def get_avg_lum(image, x, y, my):
     sum = 0
     for i in range(1, my + 1):
@@ -30,12 +31,12 @@ def get_avg_lum(image, x, y, my):
 buffer = ''
 msg = ''
 for i in range(img_width * img_height):
+    # if avg lum > than current pixel lumi value write 1 to buffer
     if get_avg_lum(image, ind_height.item(i), ind_width.item(i), my) > sl.get_luminosity_old(image, ind_height.item(i), ind_width.item(i)):
-    #if get_avg_lum(image, ind_height[i], ind_width[i], my) > sl.get_luminosity(image, ind_height[i], ind_width[i]):
         buffer += "1"
     else:
         buffer += "0"
-    if len(buffer) == 8:
+    if len(buffer) == 8: # when buffer get 8 bits convert this buffer to symbol and concatenate to extract message
         #symbol = sl.msgdecoder(buffer)
         symbol = int(buffer, 2)
         msg += chr(symbol)
