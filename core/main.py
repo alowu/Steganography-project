@@ -3,7 +3,7 @@ import stegano_lib_def as sl
 import numpy as np
 import cv2
 
-my = 10
+my = 3
 
 msg = "Hello world\0"
 msg_str_len = len(msg)
@@ -11,7 +11,7 @@ msg_bin = sl.msgencoder(msg)
 msg_bin_len = len(msg_bin)
 if msg_bin_len % 2 != 0: msg_bin = '0' + msg_bin
 
-image = sl.load_image("C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\kotiki.bmp")
+image = sl.load_image("C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\apple.bmp")
 new_path = "C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\apple_new.bmp"
 img_width = image.shape[1]
 img_height = image.shape[0]
@@ -48,9 +48,10 @@ def get_avg_lum(image, x, y, my):
 buffer = ''
 msg = ''
 for i in range(img_width * img_height):
-    #if get_avg_lum(new_image, ind_x.item(i), ind_y.item(i), my) < sl.get_luminosity_old(new_image, ind_x.item(i), ind_y.item(i)):
-    #if get_avg_lum(image, ind_x.item(i), ind_y.item(i), my) > sl.get_luminosity(image, ind_x.item(i), ind_y.item(i)):
-    if sl.get_blue(new_image, ind_x.item(i), ind_y.item(i)) == 255:
+    current = sl.get_luminosity_old(new_image, ind_x.item(i), ind_y.item(i))
+    predict = get_avg_lum(new_image, ind_x.item(i), ind_y.item(i), my)
+    delta = current - predict
+    if delta > 0:
         buffer += "1"
     else:
         buffer += "0"

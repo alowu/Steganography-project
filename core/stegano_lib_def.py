@@ -19,7 +19,7 @@ def get_luminosity(image, x, y):
     return image.item(x, y, 0) * 0.0722 + image.item(x, y, 1) * 0.7152 + image.item(x, y, 2) * 0.2126 #BGR
 
 def get_luminosity_old(image, x, y):
-    return image.item(x, y, 0) * 0.114 + image.item(x, y, 1) * 0.587 + image.item(x, y, 2) * 0.299 #BGR
+    return image.item(x, y, 0) * 0.11448 + image.item(x, y, 1) * 0.58662 + image.item(x, y, 2) * 0.29890 #BGR
 
 # get blue component luminosity value
 def get_blue(image, x, y):
