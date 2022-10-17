@@ -3,15 +3,20 @@ import numpy as np
 import math
 import re
 
-q = 0.05
-#q = input("энергия встраиваемого сигнала: ")
-#q = float(q)
+q = 0.3
+q = input("энергия встраиваемого сигнала: ")
+q = float(q)
 c = 3
-#c = input("размер области: ")
+c = input("размер области: ")
+c = int(c)
+text = "its finnaly works with any string length"
+text = input("введите текст: ")
 
 x_pos = c
 y_pos = c
-num_rep = 5
+num_rep = 1
+#num_rep = input("количество повторений: ")
+#num_rep = int(num_rep)
 
 
 kotiki = "C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\kotiki.bmp"
@@ -31,9 +36,17 @@ def toBinary(msg):
     l, m = [],[]
     for i in msg:
         l.append(ord(i))
-    #for i in l:
-    #    m.append(int(bin(i)[2:]))
+    for i in l:
+        m.append(int(bin(i)[2:]))
     return l
+
+def toBinary2(a):
+  l,m=[],[]
+  for i in a:
+    l.append(ord(i))
+  for i in l:
+    m.append(int(bin(i)[2:]))
+  return m
 
 def cutZero(s):
     for i in range(0,8):
@@ -123,7 +136,7 @@ def readBit(image):
     for i in range(0, num_rep):
         if x_pos + c + 1 > img_h:
             x_pos = c
-            y_pos = c + 1
+            y_pos += c + 1
         sum += readPixel(image, x_pos, y_pos)
         x_pos += c + 1
     avg = sum#/c/4
@@ -146,7 +159,8 @@ def encode(image, msg):
     if len(msg) * 8 * num_rep > (int(img_h) / 4 - 1) * (int(img_w) / 4 - 1):
         print("picture is small")
         exit()
-    for i in range(0, len(msg)):
+    limit = len(msg)
+    for i in range(0, limit):
         bit = msg[i]
         writeByte(image, bit)
     cv2.imwrite(kotiki, image)
@@ -154,14 +168,33 @@ def encode(image, msg):
 def decode(image):
     global x_pos; x_pos = c
     global y_pos; y_pos = c
-    l1 = readByte(image)
-    l2 = readByte(image)
-    #l3 = readByte(image)
-    #l4 = readByte(image)
+    ll = []
+    for i in range(0, 8):
+        ll.insert(i,readByte(image))
 
-    len = ""
-    len += str(l1) + str(l2) #+ str(l3) + str(l4)
-    print(len)
+    len1 = ""
+    for i in range(0, 8):
+        len1 += str(ll[i])
+    #print(len1)
+
+    msg_len = ""
+
+    for i in range(0, 4):
+        t = len1[i*8:(i+1)*8]
+        n = toString2([int(t)])
+        #print(n)
+        msg_len += n
+    #print(msg_len)
+    msg_len = int(msg_len)
+
+    result = ""
+    for i in range(0, msg_len):
+        t = readByte(image)
+        result += toString2([int(t)])
+
+    print(result)
+    return result
+
 
 def addLenMsg(msg):
     leng = len(msg)
@@ -169,7 +202,7 @@ def addLenMsg(msg):
     if leng > 9999:
         print("message is too big"); exit()
     else:
-        tmp = list("0000")
+        tmp = list("00000000")
         i = 3
         while leng >= 1:
             n = int(leng) % 10
@@ -180,28 +213,31 @@ def addLenMsg(msg):
         len_m = tmp + msg
         return len_m
 
-len_m = addLenMsg("")
+#len_m = addLenMsg("")
 #print(len_m)
-enc = toBinary(len_m)
-print(enc)
+#enc = toBinary(len_m)
+#print(enc)
 #print(toString(enc))
-print(len(enc))
-fullMsg = []
-ind = 0
-for j in range(0, len(enc)):
-    byte = enc[j]
-    for i in reversed(range(0, 8)):
-        fullMsg.insert(ind, (byte >> i) & 1)
-        ind += 1
+#print(len(enc))
+#fullMsg = []
+#ind = 0
+#for j in range(0, len(enc)):
+#    byte = enc[j]
+#    for i in reversed(range(0, 8)):
+#        fullMsg.insert(ind, (byte >> i) & 1)
+#        ind += 1
         #print(bit)
-print(fullMsg)
-print(len(fullMsg))
+#print(fullMsg)
+#print(len(fullMsg))
 
-s = "00110000"
-s_new = cutZero(s)
-print(s_new)
-print(toString2([int(s_new)]))
+#s = "00110000"
+#s_new = cutZero(s)
+#print(s_new)
+#print(toString2([int(s_new)]))
 
 
-encode(img, [100011, 11110000])
+
+text = addLenMsg(text)
+text = toBinary2(text)
+encode(img, text)
 decode(img)
