@@ -9,11 +9,8 @@ def texttoimg(text, path, key, q=0.5):
     img_h = img.shape[0]
 
     amount_bits, text = encrypt.tobinary(text)
-    print(f'amount after tobinary {amount_bits}')
 
     key = str(len(text)) + "@" + str(amount_bits) + "@" + key
-    print(text)
-    print(key)
 
     key_b = key.encode('ascii')
     base64_bytes = base64.b64encode(key_b)
@@ -48,30 +45,32 @@ def imgtotext(path, key_base64):
 
 
 def main():
-    choose = int(input('CHOOSE OPTION'
-                       '1 for encrypt text'
-                       '2 for decrypt text'))
+    choose = int(input('CHOOSE OPTION\n'
+                       '1 for encrypt text\n'
+                       '2 for decrypt text\n'))
 
     if choose == 1:
-        t, k, pi = ''
-        while t != '':
+        t = k = pi = ''
+        while t == '':
             t = input("Enter text to encrypt: ")
-        while k != '':
+        while k == '':
             k = input("Enter key for encryption: ")
-        while pi != '':
+        while pi == '':
             pi = input("Copy path to image: ")
-        q = float(input("Enter energy of encryption in range 0.05 to 1 (or click enter, default 0.5): "))
+            pi = pi.replace('\\', '\\\\')
+        q = input("Enter energy of encryption in range 0.05 to 1 (or click enter, default 0.5): ")
         if q:
-            texttoimg(t, pi, k, q)
+            texttoimg(t, pi, k, float(q))
         else:
             texttoimg(t, pi, k)
 
     elif choose == 2:
-        pi, k = ''
-        while k != '':
+        pi = k = ''
+        while k == '':
             k = input("Enter key for decryption: ")
-        while pi != '':
+        while pi == '':
             pi = input("Copy path to image: ")
+            pi = pi.replace('\\', '\\\\')
         imgtotext(pi, k)
 
 

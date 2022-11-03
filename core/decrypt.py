@@ -65,5 +65,4 @@ def decode(image, p_x, p_y, amount_chars, num_rep=1, c=3):
         t = readbyte(image, num_rep, c, x, y)
         result += tostring([int(t)])
 
-    print(result)
     return result
