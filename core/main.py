@@ -1,66 +1,79 @@
-# rewrite logic into one file without using functions
-import stegano_lib_def as sl
-import numpy as np
-import cv2
+import base64
+import decrypt
+import encrypt
 
-my = 3
 
-msg = "Hello world\0"
-msg_str_len = len(msg)
-msg_bin = sl.msgencoder(msg)
-msg_bin_len = len(msg_bin)
-if msg_bin_len % 2 != 0: msg_bin = '0' + msg_bin
+def texttoimg(text, path, key, q=0.5):
+    img = encrypt.cv2.imread(path)
+    img_w = img.shape[1]
+    img_h = img.shape[0]
 
-image = sl.load_image("C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\apple.bmp")
-new_path = "C:\\Users\\User\\Documents\\Python\\Steganography-project\\resources\\apple_new.bmp"
-img_width = image.shape[1]
-img_height = image.shape[0]
+    amount_bits, text = encrypt.tobinary(text)
+    print(f'amount after tobinary {amount_bits}')
 
-ind_x = np.random.randint(my + 1, img_height - my, msg_bin_len)
-ind_y = np.random.randint(my + 1, img_width - my, msg_bin_len)
-rep = 0
+    key = str(len(text)) + "@" + str(amount_bits) + "@" + key
+    print(text)
+    print(key)
 
-for i in range(msg_bin_len):
-    if msg_bin[i] == '0':
-        print("iteration before zero", i, sl.get_luminosity_old(image, ind_x.item(i), ind_y.item(i)))
-        sl.set_blue_last_0(image, ind_x.item(i), ind_y.item(i))
-        print("iteration after zero", i, sl.get_luminosity_old(image, ind_x.item(i), ind_y.item(i)))
-    else:
-        print("iteration before one", i, sl.get_luminosity_old(image, ind_x.item(i), ind_y.item(i)))
-        sl.set_blue_last_1(image, ind_x.item(i), ind_y.item(i))
-        print("iteration after one", i, sl.get_luminosity_old(image, ind_x.item(i), ind_y.item(i)))
+    key_b = key.encode('ascii')
+    base64_bytes = base64.b64encode(key_b)
+    key_base64 = base64_bytes.decode('ascii')
 
-cv2.imwrite(sl.new_path, image)
-new_image = sl.load_image(new_path)
+    print(f'''use this key to decode:
+    --->   {key_base64}   <---''')
 
-#cv2.imshow('img', new_image)
-#cv2.waitKey(0)
+    points_x, points_y = encrypt.createlists(amount_bits, img_h, img_w, key_base64)
+    new = encrypt.encode(img, text, path, points_x, points_y, q)
+    if new:
+        print(f'Text is saved in image. Path to it is:'
+              f'{new}')
+    input("Press any key to exit")
 
-def get_avg_lum(image, x, y, my):
-    sum = 0
-    for i in range(1, my + 1):
-        sum += sl.get_blue(image, x, y + i)
-        sum += sl.get_blue(image, x, y - i)
-        sum += sl.get_blue(image, x + i, y)
-        sum += sl.get_blue(image, x - i, y)
-    return sum/4/my
 
-buffer = ''
-msg = ''
-for i in range(img_width * img_height):
-    current = sl.get_luminosity_old(new_image, ind_x.item(i), ind_y.item(i))
-    predict = get_avg_lum(new_image, ind_x.item(i), ind_y.item(i), my)
-    delta = current - predict
-    if delta > 0:
-        buffer += "1"
-    else:
-        buffer += "0"
-    if len(buffer) == 8:
-        #symbol = sl.msgdecoder(buffer)
-        #print(buffer)
-        symbol = int(buffer, 2)
-        msg += chr(symbol)
-        buffer = ''
-        print(msg)
-        if symbol == '\0':
-            break
+def imgtotext(path, key_base64):
+    base64_bytes = key_base64.encode('ascii')
+    key_bytes = base64.b64decode(base64_bytes)
+    key = key_bytes.decode('ascii')
+
+    amount_chars, amount_bits, key_decode = key.split('@')
+
+    img_decode = encrypt.cv2.imread(path)
+    img_w_decode = img_decode.shape[1]
+    img_h_decode = img_decode.shape[0]
+    points_x_decode, points_y_decode = encrypt.createlists(int(amount_bits), img_h_decode, img_w_decode, key_base64)
+    result = decrypt.decode(img_decode, points_x_decode, points_y_decode, int(amount_chars))
+    print(f'Decrypted text is:'
+          f'{result}')
+    input("Press any key to exit")
+
+
+def main():
+    choose = int(input('CHOOSE OPTION'
+                       '1 for encrypt text'
+                       '2 for decrypt text'))
+
+    if choose == 1:
+        t, k, pi = ''
+        while t != '':
+            t = input("Enter text to encrypt: ")
+        while k != '':
+            k = input("Enter key for encryption: ")
+        while pi != '':
+            pi = input("Copy path to image: ")
+        q = float(input("Enter energy of encryption in range 0.05 to 1 (or click enter, default 0.5): "))
+        if q:
+            texttoimg(t, pi, k, q)
+        else:
+            texttoimg(t, pi, k)
+
+    elif choose == 2:
+        pi, k = ''
+        while k != '':
+            k = input("Enter key for decryption: ")
+        while pi != '':
+            pi = input("Copy path to image: ")
+        imgtotext(pi, k)
+
+
+if __name__ == "__main__":
+    main()

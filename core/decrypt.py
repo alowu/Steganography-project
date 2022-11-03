@@ -1,48 +1,69 @@
-import stegano_lib_def as sl
-import numpy as np
+import math
 
-my = 2
 
-seed_ = int(input("enter seed: "))
+def blue(image, x, y):
+    return image.item(x, y, 0)
 
-image = sl.load_image(sl.new_path)
-img_width = image.shape[1]
-img_height = image.shape[0]
 
-#ind_width = list(range(4,92))
-#ind_height = list(range(4, 92))
-np.random.seed(seed_)
-ind_width = np.random.randint(my + 1, img_width - my, img_width * img_height)
-np.random.seed(seed_)
-ind_height = np.random.randint(my + 1, img_height - my, img_width * img_height)
-print(ind_height)
-print(ind_width)
+def tostring(a):
+    l = []
+    m = ""
+    for i in a:
+        p = 0
+        c = 0
+        k = int(math.log10(i)) + 1
+        for j in range(k):
+            p = ((i % 10) * (2 ** j))
+            i = i // 10
+            c = c + p
+        l.append(c)
+    for x in l:
+        m = m + chr(x)
+    return m
 
-# calculate avg lumi value of near pixels
-def get_avg_lum(image, x, y, my):
-    sum = 0
-    for i in range(1, my + 1):
-        sum += sl.get_luminosity_old(image, x - i, y)
-        sum += sl.get_luminosity_old(image, x + i, y)
-        sum += sl.get_luminosity_old(image, x, y - i)
-        sum += sl.get_luminosity_old(image, x, y + i)
-    return sum/4/my
 
-buffer = ''
-msg = ''
-for i in range(img_width * img_height):
-    # if avg lum > than current pixel lumi value write 1 to buffer
-    if get_avg_lum(image, ind_height.item(i), ind_width.item(i), my) > sl.get_luminosity_old(image, ind_height.item(i), ind_width.item(i)):
-        buffer += "1"
+def readpixel(image, x, y, c):
+    summ = 0
+    for i in range(1, c + 1):
+        summ += blue(image, x + i, y)
+        summ += blue(image, x - i, y)
+        summ += blue(image, x, y + i)
+        summ += blue(image, x, y - i)
+    avg = summ / 4 / c
+    blue_ = blue(image, x, y)
+    if blue_ > avg:
+        return 1
     else:
-        buffer += "0"
-    if len(buffer) == 8: # when buffer get 8 bits convert this buffer to symbol and concatenate to extract message
-        #symbol = sl.msgdecoder(buffer)
-        symbol = int(buffer, 2)
-        msg += chr(symbol)
-        buffer = ''
-        print(msg)
-        if symbol == '\0':
-            break
+        return 0
 
-print(msg)
+
+def readbit(image, num_rep, c, p_x, p_y):
+    summ = 0
+    for i in range(0, num_rep):
+        summ += readpixel(image, p_x, p_y, c)
+
+    if summ > 0.5:
+        return 1
+    else:
+        return 0
+
+
+def readbyte(image, num_rep, c, p_x, p_y):
+    val = ""
+    ran = len(p_x)
+    for i in range(0, ran):
+        tmp = readbit(image, num_rep, c, p_x[i], p_y[i])
+        val += str(tmp)
+    return val
+
+
+def decode(image, p_x, p_y, amount_chars, num_rep=1, c=3):
+    result = ""
+    for i in range(amount_chars):
+        x = p_x[i * 8:(i + 1) * 8]
+        y = p_y[i * 8:(i + 1) * 8]
+        t = readbyte(image, num_rep, c, x, y)
+        result += tostring([int(t)])
+
+    print(result)
+    return result
