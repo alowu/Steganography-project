@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>KutterGMH</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -140,7 +140,7 @@
      </rect>
     </property>
     <property name="placeholderText">
-     <string>Enter energy of encryption in range 0.05 to 1 (or click enter, default 0.5):</string>
+     <string>Enter energy of encryption in range 0.05 to 1 (default 0.5):</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="textDecryptionKey">
@@ -193,6 +193,19 @@
     </property>
     <property name="placeholderText">
      <string>The decrypted message will be here</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="AboutAppButton">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>660</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>About</string>
     </property>
    </widget>
   </widget>
