@@ -143,7 +143,7 @@
      <string>Enter energy of encryption in range 0.05 to 1 (or click enter, default 0.5):</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textKeyForDecryption">
+   <widget class="QTextEdit" name="textDecryptionKey">
     <property name="geometry">
      <rect>
       <x>420</x>
@@ -169,7 +169,7 @@
      <string>Open File</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
+   <widget class="QTextBrowser" name="textKeyBrowser">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -182,17 +182,17 @@
      <string>Key for decryption: </string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QTextBrowser" name="textDecryptionMessageBrowser">
     <property name="geometry">
      <rect>
       <x>420</x>
       <y>470</y>
       <width>261</width>
-      <height>211</height>
+      <height>221</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Decryption message:</string>
+    <property name="placeholderText">
+     <string>The decrypted message will be here</string>
     </property>
    </widget>
   </widget>
