@@ -42,19 +42,21 @@ class MyApp(QMainWindow):
 
     def open_left_image(self):
         global fnamel
-        fnamel = QFileDialog.getOpenFileName(self, 'Open Image', 'D:\\Steganography-project\\resources', 'Image (*.bmp)')[0]    #функция getOpenFileName() возвращает список из двух значений: путь к файлу и расширение; поэтому мы берём только перую переменную (путь к файлу) из возвращаемого списка
+        fnamel = QFileDialog.getOpenFileName(self, 'Open Image', '', 'Image (*.bmp)')[0]    #функция getOpenFileName() возвращает список из двух значений: путь к файлу и расширение; поэтому мы берём только перую переменную (путь к файлу) из возвращаемого списка
         self.pixmapLeft = QPixmap(fnamel)
         self.labelLeft.setPixmap(self.pixmapLeft)
 
     def open_right_image(self):
         global fnamer
-        fnamer = QFileDialog.getOpenFileName(self, 'Open Image', 'D:\\Steganography-project\\resources', 'Image (*.bmp)')[0]    #функция getOpenFileName() возвращает список из двух значений: путь к файлу и расширение; поэтому мы берём только перую переменную (путь к файлу) из возвращаемого списка
+        fnamer = QFileDialog.getOpenFileName(self, 'Open Image', '', 'Image (*.bmp)')[0]    #функция getOpenFileName() возвращает список из двух значений: путь к файлу и расширение; поэтому мы берём только перую переменную (путь к файлу) из возвращаемого списка
         self.pixmapRight = QPixmap(fnamer)
         self.labelRight.setPixmap(self.pixmapRight)
 
     def save_image(self):
         image = ImageQt.fromqpixmap(self.labelRight.pixmap())
-        image.save('test.jpg')
+        name, _ = QFileDialog.getSaveFileName(self, 'Save Image With Decryption Message', '', 'Image (*.bmp)')
+        image.save(name)
+
 
     def clicker_encrypt_button(self):
         flag = 1
